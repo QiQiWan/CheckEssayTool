@@ -6,12 +6,14 @@
 :GitLab: https://gitlab.com/samzhangjy
 """
 import datetime
+from glob import escape
 import time as time_lib
 from time import mktime, strptime, time
 from urllib.parse import quote
 
 import requests
 from bs4 import BeautifulSoup
+from sympy import re
 
 from baiduspider._spider import BaseSpider
 from baiduspider.errors import ParseError, UnknownError
@@ -265,6 +267,7 @@ class BaiduSpider(BaseSpider):
             to = time[1]
         else:
             to = from_ = None
+        results = {}
         if type(to) == datetime.datetime and type(from_) == datetime.datetime:
             FORMAT = "%Y-%m-%d %H:%M:%S"
             to = int(time_lib.mktime(time_lib.strptime(to.strftime(FORMAT), FORMAT)))
@@ -281,8 +284,13 @@ class BaiduSpider(BaseSpider):
         except Exception as err:
             error = err
         finally:
-            self._handle_error(error, "BaiduSpider", "parse-web")
-        return {"results": results["results"], "total": results["pages"]}
+            # self._handle_error(error, "BaiduSpider", "parse-web")
+            if 'results' in results.keys() and 'pages' in results.keys():
+                return {"results": results["results"], "total": results["pages"]}
+            else:
+                if error:
+                    results['res'] = False
+                return {"results": {}, "total": {}}
 
     def search_pic(self, query: str, pn: int = 1) -> dict:
         """百度图片搜索.

@@ -199,7 +199,7 @@ class spider:
         if result == []:
             self.repeat += 1
             # 如果重复五次没有搜索到结果，则返回没有匹配
-            if self.repeat >= 150:
+            if self.repeat >= 50:
                 self.repeat = 0
                 return False
             return self.BaiduSearch(query=query)
